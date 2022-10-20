@@ -57,4 +57,32 @@ module.exports = function (e) {
 
     res.json({ result: true });
   });
+
+  /**
+   * Save something in the database
+   */
+  e.saveNewUser3 = functions.https.onRequest(async (req, res) => {
+    const newUser = db.collection("user").doc();
+    const result = await newUser.set({
+      first: "Kevin3",
+      last: "Justal",
+      born: 1750,
+    });
+    res.json(result);
+  });
+
+  /**
+   * Update
+   */
+  e.updateUser = functions.https.onRequest(async (req, res) => {
+    const userRef = db.collection("user").doc("alovelace");
+
+    // Set the 'capital' field of the city
+    await userRef.update({
+      first: "Trololo2",
+      timestamp: FieldValue.serverTimestamp(),
+      born: FieldValue.increment(50),
+    });
+    res.json({ result: true });
+  });
 };
