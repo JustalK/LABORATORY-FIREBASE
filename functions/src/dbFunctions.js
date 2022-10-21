@@ -71,4 +71,32 @@ module.exports = function (e) {
     });
     res.json({ result: true });
   });
+
+  e.reset = functions.https.onRequest(async (req, res) => {
+    const snapshot = await db.collection("user").get();
+
+    const batch = db.batch();
+    snapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+
+    res.json({ result: true });
+  });
+
+  e.bash = functions.https.onRequest(async (req, res) => {
+    const batch = db.batch();
+
+    const firstRef = db.collection("user").doc();
+    batch.set(firstRef, { first: "First" });
+
+    const secondRef = db.collection("user").doc();
+    batch.set(secondRef, { first: "Second" });
+
+    const thirdRef = db.collection("user").doc();
+    batch.set(thirdRef, { first: "Third" });
+
+    await batch.commit();
+    res.json({ result: true });
+  });
 };
