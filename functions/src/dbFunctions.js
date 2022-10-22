@@ -6,14 +6,69 @@ const db = getFirestore(app);
 
 module.exports = function (e) {
   /**
+   * Init a collection
+   */
+  e.init = functions.https.onRequest(async (req, res) => {
+    const batch = db.batch();
+
+    const firstRef = db.collection("user").doc();
+    batch.set(firstRef, { name: "First" });
+
+    const secondRef = db.collection("user").doc();
+    batch.set(secondRef, { name: "Second" });
+
+    const thirdRef = db.collection("user").doc();
+    batch.set(thirdRef, { name: "Third" });
+
+    await batch.commit();
+    res.json({ result: true });
+  });
+
+  /**
+   * Reset a collection
+   */
+  e.reset = functions.https.onRequest(async (req, res) => {
+    const snapshot = await db.collection("user").get();
+
+    const batch = db.batch();
+    snapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+
+    res.json({ result: true });
+  });
+
+  /**
    * Get the data from one particular collection
    */
   e.getUsers = functions.https.onRequest(async (req, res) => {
     const snapshot = await db.collection("user").get();
+
+    let result = [];
     snapshot.forEach((doc) => {
-      console.log(doc.id, "=>", doc.data());
+      result.push(doc.data());
     });
-    res.json({ result: true });
+
+    res.json(result);
+  });
+
+  /**
+   * Get the data from one particular collection with condition
+   */
+  e.getUsers2 = functions.https.onRequest(async (req, res) => {
+    const citiesRef = db.collection("user");
+    const snapshot = await citiesRef.where("name", "==", "First").get();
+    if (snapshot.empty) {
+      console.log("No matching documents.");
+      return;
+    }
+
+    let result = [];
+    snapshot.forEach((doc) => {
+      result.push(doc.data());
+    });
+    res.json(result);
   });
 
   /**
@@ -69,34 +124,6 @@ module.exports = function (e) {
       timestamp: FieldValue.serverTimestamp(),
       born: FieldValue.increment(50),
     });
-    res.json({ result: true });
-  });
-
-  e.reset = functions.https.onRequest(async (req, res) => {
-    const snapshot = await db.collection("user").get();
-
-    const batch = db.batch();
-    snapshot.forEach((doc) => {
-      batch.delete(doc.ref);
-    });
-    await batch.commit();
-
-    res.json({ result: true });
-  });
-
-  e.bash = functions.https.onRequest(async (req, res) => {
-    const batch = db.batch();
-
-    const firstRef = db.collection("user").doc();
-    batch.set(firstRef, { first: "First" });
-
-    const secondRef = db.collection("user").doc();
-    batch.set(secondRef, { first: "Second" });
-
-    const thirdRef = db.collection("user").doc();
-    batch.set(thirdRef, { first: "Third" });
-
-    await batch.commit();
     res.json({ result: true });
   });
 };
