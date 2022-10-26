@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { faker } = require("@faker-js/faker");
 
 const app = require("./config");
 const db = getFirestore(app);
@@ -15,10 +16,10 @@ module.exports = function (e) {
     batch.set(firstRef, { name: "First" });
 
     const secondRef = db.collection("user").doc();
-    batch.set(secondRef, { name: "Second" });
+    batch.set(secondRef, { name: faker.name.fullName() });
 
     const thirdRef = db.collection("user").doc();
-    batch.set(thirdRef, { name: "Third" });
+    batch.set(thirdRef, { name: faker.name.fullName() });
 
     await batch.commit();
     res.json({ result: true });
@@ -79,8 +80,8 @@ module.exports = function (e) {
     const docRef = db.collection("user").doc("alovelace");
 
     await docRef.set({
-      first: "Ada2",
-      last: "Lovelace",
+      first: faker.name.firstName(),
+      last: faker.name.lastname(),
       born: 1815,
     });
     res.json({ result: true });
@@ -91,8 +92,8 @@ module.exports = function (e) {
    */
   e.saveNewUser2 = functions.https.onRequest(async (req, res) => {
     db.collection("user").add({
-      first: "Ada2",
-      last: "Lovelace",
+      first: faker.name.firstName(),
+      last: faker.name.lastname(),
       born: 1815,
     });
 
@@ -105,8 +106,8 @@ module.exports = function (e) {
   e.saveNewUser3 = functions.https.onRequest(async (req, res) => {
     const newUser = db.collection("user").doc();
     const result = await newUser.set({
-      first: "Kevin3",
-      last: "Justal",
+      first: faker.name.firstName(),
+      last: faker.name.lastname(),
       born: 1750,
     });
     res.json(result);
@@ -120,7 +121,8 @@ module.exports = function (e) {
 
     // Set the 'capital' field of the city
     await userRef.update({
-      first: "Trololo2",
+      first: faker.name.firstName(),
+      last: faker.name.lastname(),
       timestamp: FieldValue.serverTimestamp(),
       born: FieldValue.increment(50),
     });
