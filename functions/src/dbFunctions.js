@@ -13,7 +13,7 @@ module.exports = function (e) {
     const batch = db.batch();
 
     const firstRef = db.collection("user").doc();
-    batch.set(firstRef, { name: "First" });
+    batch.set(firstRef, { name: "First", n: 10 });
 
     const secondRef = db.collection("user").doc();
     batch.set(secondRef, { name: faker.name.fullName() });
@@ -71,6 +71,29 @@ module.exports = function (e) {
     });
     res.json(result);
   });
+
+  /**
+   * Get the data from one particular collection with compound queries
+   */
+  /**
+  e.getUsers3 = functions.https.onRequest(async (req, res) => {
+    const citiesRef = db.collection("user");
+    const snapshot = await citiesRef
+      .where("name", "==", "First")
+      .where("name", "!==", "Second")
+      .get();
+    if (snapshot.empty) {
+      console.log("No matching documents.");
+      return;
+    }
+
+    let result = [];
+    snapshot.forEach((doc) => {
+      result.push(doc.data());
+    });
+    res.json(result);
+  });
+  **/
 
   /**
    * https://firebase.google.com/docs/firestore/manage-data/add-data
