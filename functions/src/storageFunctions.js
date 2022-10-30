@@ -15,7 +15,7 @@ module.exports = function (e) {
   e.upload = functions.https.onRequest(async (req, res) => {
     const bucket = admin.storage().bucket();
     var form = new formidable.IncomingForm();
-    const result = new Promise((resolve, reject) => {
+    const result = await new Promise((resolve, reject) => {
       form.parse(req, async (err, fields, files) => {
         var file = files.file;
         var filePath = file.path;
@@ -34,18 +34,15 @@ module.exports = function (e) {
             },
           });
 
-        const fullMediaLink = response[0].metadata.mediaLink;
-        const mediaLinkPath = fullMediaLink.substring(
-          0,
-          fullMediaLink.lastIndexOf("/") + 1
-        );
+        const bucketName = response[0].metadata.bucket;
         const downloadUrl =
-          mediaLinkPath +
+          "https://firebasestorage.googleapis.com/v0/b/" +
+          bucketName +
+          "/o/" +
           encodeURIComponent(response[0].name) +
           "?alt=media&token=" +
           uuid;
 
-        console.log({ fileInfo: response[0].metadata, downloadUrl });
         resolve({ fileInfo: response[0].metadata, downloadUrl });
       });
     });
