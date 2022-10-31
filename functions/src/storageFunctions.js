@@ -49,4 +49,18 @@ module.exports = function (e) {
     console.log(result);
     res.json(result);
   });
+
+  e.download = functions.https.onRequest(async (req, res) => {
+    const options = {
+      destination:
+        "/home/justalk/Downloads/upload_112c6ba53cc33a6ac27ca46ed15b9bf0.jpg",
+    };
+    const result = await admin
+      .storage()
+      .bucket()
+      .file("upload_112c6ba53cc33a6ac27ca46ed15b9bf0")
+      .download(options);
+
+    res.json(result);
+  });
 };
