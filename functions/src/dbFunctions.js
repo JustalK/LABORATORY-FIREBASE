@@ -136,6 +136,16 @@ module.exports = function (e) {
     res.json(result);
   });
 
+  e.saveNewUser4 = functions.https.onRequest(async (req, res) => {
+    const newUser = db.collection("user").doc();
+    const result = await newUser.set({
+      first: "banned",
+      last: "banned",
+      born: 1650,
+    });
+    res.json(result);
+  });
+
   /**
    * Update
    */
